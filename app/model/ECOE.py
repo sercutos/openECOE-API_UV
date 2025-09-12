@@ -28,6 +28,7 @@ from app.model.Area import Area
 from app.model.Shift import Shift
 from app.model.Round import Round
 from app.model.Stage import Stage
+from app.model.Organization import Organization
 
 class ChronoNotFound(PageNotFound):
     def __init__(self, **kwargs):
@@ -79,6 +80,8 @@ class ECOE(db.Model):
         stages = []
         stage_events = {}
 
+        org = Organization.query.get(self.id_organization)
+
         for sch in self.schedules:
             if sch.stage not in stages:
                 stages.append(sch.stage)
@@ -116,6 +119,7 @@ class ECOE(db.Model):
                 "id": self.id,
                 "name": self.name,
                 "organization": self.id_organization,
+                "organization_name": org.name,
                 "time_start": time_start.__str__() + " GMT+0000",
             },
             "rounds": [{"id": r.id, "name": r.description} for r in self.rounds],
