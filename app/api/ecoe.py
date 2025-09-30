@@ -295,18 +295,24 @@ class EcoeResource(OpenECOEResource):
         
     @ItemRoute.GET("/results-area", rel='results_by_area')
     def send_results_for_area(self, ecoe):
-        object_permissions = self.manager.get_permissions_for_item(ecoe)
-        if "manage" in object_permissions and object_permissions["manage"] is not True:
-            raise Forbidden
+        try:
+            object_permissions = self.manager.get_permissions_for_item(ecoe)
+            if "manage" in object_permissions and object_permissions["manage"] is not True:
+                raise Forbidden
+                
+            from collections import defaultdict
+            id_area = request.args['area']
+            id_ecoe = str(ecoe.id)
+            dataFrame = get_results_for_area(id_area, id_ecoe)  
             
-        from collections import defaultdict
-        id_area = request.args['area']
-        id_ecoe = str(ecoe.id)
-        dataFrame = get_results_for_area(id_area, id_ecoe)  
-        
-        dd = defaultdict(list)
-        cadena = dataFrame.to_dict('records',into=dd)
-        return cadena   
+            dd = defaultdict(list)
+            cadena = dataFrame.to_dict('records',into=dd)
+            return cadena
+        except AttributeError as err:
+            error = "Error de atributo (Resultados por Área)"
+            for arg in err.args:
+                error = error + arg
+            return "ko - Error: " + error
 
     @ItemRoute.GET("/results/item-score", rel='items_score_by_ecoe')
     def send_items_score(self, ecoe):
