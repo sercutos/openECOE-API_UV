@@ -48,3 +48,5 @@ services:
         condition: service_started
       db:
         condition: service_healthy
+volumes:
+  mysql_data:
