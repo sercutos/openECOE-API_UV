@@ -14,6 +14,9 @@ mysql -h"$OPENECOE_DB_HOST" -u"$OPENECOE_DB_USER" -p"$OPENECOE_DB_PASSWORD" -e "
 echo ">>> Ejecutando migraciones Alembic..."
 #flask db upgrade || true
 flask db upgrade
+echo "🌱 Insertando datos iniciales..."
+ARCHIVE_ROUTE=/app/api/archive python /app/api/seed.py
+python /app/api/seed.py
 
 echo ">>> Ejecutando first-run..."
 /docker-entrypoint.d/90-first-run.sh || true

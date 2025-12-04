@@ -13,14 +13,6 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-
-
-    
-    
-
-
-
-
 # Copiar dependencias y generar requirements
 COPY poetry.lock pyproject.toml ./
 RUN poetry export --format=requirements.txt --output=requirements.txt --with chrono --with api --without-hashes
@@ -44,6 +36,11 @@ ENV PYTHONUNBUFFERED=1
 # Scripts alembic y creacion de usuarios
 COPY .docker/deploy/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+# Scripts seed insertamos datos por defecto en db
+COPY seed.py /app/api/seed.py
+RUN chmod +x /app/api/seed.py
+
+
 ## COPY .docker/deploy/first-run.sh /docker-entrypoint.d/90-first-run.sh
 COPY .docker/deploy/first-run.sh /docker-entrypoint.d/90-first-run.sh
 RUN chmod +x /docker-entrypoint.d/90-first-run.sh
