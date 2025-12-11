@@ -25,7 +25,7 @@ def get_results_for_area_total(ecoe):
             on=['id_student']).loc[:,['id_student','points']].fillna(0).groupby("id_student", as_index=False).sum()
         
         #NOTA ABSOLUTA, sumamos los puntos de las preguntas que hay en toda la ECOE
-        total_points = df_question.loc[:,['max_points']].sum()['max_points']
+        total_points = df_question.loc[:,['max_points']].sum()['max_points']        
         df_answer = df_answer.assign(absolute_score = total_points)
         #NOTA RELATIVA, en función de la puntuación máxima sacada por un estudiante
         max_points =df_answer['points'].max()
@@ -76,7 +76,7 @@ def resultados_evaluativo_ecoe(ecoe, datatype="dict") -> dict:
         _median = df_answer['med'].values[0]
         _median = _median/df_answer['absolute_score'].values[0]*100
         df_final['med_total'] = _median
-        df_final['absolute_score'] = df_final['points']/df_final['absolute_score']*10
+        df_final['absolute_score'] = df_final['points']/df_final['absolute_score']*10        
         df_final['relative_score'] = df_final['points']/df_final['relative_score']*10
         
         

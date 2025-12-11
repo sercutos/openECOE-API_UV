@@ -79,6 +79,11 @@ def results_by_area(idecoe) -> pd.DataFrame:
             aux = get_results_for_area(area=str(id_area[0]),ecoe=idecoe)
             #Este if esta porque si una Area no tiene preguntas hace que crashee el proceso, por lo que si el area no tiene preguntas, lo ignoramos
             if( isinstance(aux, pd.DataFrame) ):
+                nombre_area = id_area[1]
+                w = float(get_area_weith(str(id_area[0])))
+                # Añadimos la columna con el peso relativo
+                aux['weith_{}'.format(nombre_area)] = w
+                
                 lista_df.append( aux.rename(columns = {'punt':'punt_{}'.format(id_area[1]),'pos':'pos_{}'.format(id_area[1]),
                 'med':'med_{}'.format(id_area[1]),'perc':'perc_{}'.format(id_area[1])}) ) 
         df_total = lista_df[0]
