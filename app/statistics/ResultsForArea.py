@@ -45,8 +45,8 @@ def get_results_for_area(area,ecoe) -> pd.DataFrame:
         # Peso relativo del área
         weith = get_area_weith(area)
         df_answer_area = df_answer_area.assign(weith=float(weith))
-        # Filtramos columnas finales en el orden deseado
-        df_answer_area = df_answer_area.loc[:,['id_student','punt','pos','med','perc', 'weith']]
+        # Filtramos columnas finales en el orden deseado e incluimos puntos y total_points
+        df_answer_area = df_answer_area.loc[:,['id_student','punt','pos','med','perc', 'weith','points','total_points']]
         return df_answer_area
 
     except Exception as err:
@@ -84,8 +84,14 @@ def results_by_area(idecoe) -> pd.DataFrame:
                 # Añadimos la columna con el peso relativo
                 aux['weith_{}'.format(nombre_area)] = w
                 
-                lista_df.append( aux.rename(columns = {'punt':'punt_{}'.format(id_area[1]),'pos':'pos_{}'.format(id_area[1]),
-                'med':'med_{}'.format(id_area[1]),'perc':'perc_{}'.format(id_area[1])}) ) 
+                lista_df.append( aux.rename(columns = {
+                    'punt':'punt_{}'.format(id_area[1]),
+                    'pos':'pos_{}'.format(id_area[1]),
+                    'med':'med_{}'.format(id_area[1]),
+                    'perc':'perc_{}'.format(id_area[1]),
+                    'points':'points_{}'.format(id_area[1]),
+                    'total_points':'maxpoints_{}'.format(id_area[1])
+                }) ) 
         df_total = lista_df[0]
         lista_df.pop(0)
         #df_students = get_students(idecoe)

@@ -338,7 +338,9 @@ class EcoeResource(OpenECOEResource):
                         "pos": row.get(f"pos_{area_name}", 0),
                         "med": row.get(f"med_{area_name}", 0),
                         "perc": row.get(f"perc_{area_name}", 0),
-                        "weith": row.get(f"weith_{area_name}", 0)
+                        "weith": row.get(f"weith_{area_name}", 0),
+                        "points": row.get(f"points_{area_name}", 0),
+                        "max_points": row.get(f"maxpoints_{area_name}", 0)
                     }
 
             results_list.append(student_dict)
