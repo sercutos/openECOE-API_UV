@@ -21,5 +21,8 @@ python /app/api/seed.py
 echo ">>> Ejecutando first-run..."
 /docker-entrypoint.d/90-first-run.sh || true
 
+echo ">>> Lanzando servidor Chrono en segundo plano..."
+python /app/api/openecoe-chrono.py &
+
 echo ">>> Lanzando servidor Flask..."
 exec flask run --host=0.0.0.0 --port=5000
