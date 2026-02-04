@@ -28,7 +28,7 @@ services:
       OPENECOE_REDIS_PORT: 6379
       OPENECOE_REDIS_DB: 0
       EMAIL: ecoe@umh.es
-      PASSWORD: Kui0chee
+      OPENECOE_ADMIN_PASSWORD: Kui0chee
       FIRSTNAME: Open
       SURNAME: ECOE
       ORGANIZATION: UMH

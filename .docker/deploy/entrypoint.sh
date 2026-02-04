@@ -24,5 +24,13 @@ echo ">>> Ejecutando first-run..."
 echo ">>> Lanzando servidor Chrono en segundo plano..."
 python /app/api/openecoe-chrono.py &
 
-echo ">>> Lanzando servidor Flask..."
-exec flask run --host=0.0.0.0 --port=5000
+echo ">>> Ejecutando comando final..."
+# Si recibimos un comando por argumentos (del CMD de docker), lo ejecutamos.
+# Si no, lanzamos el servidor por defecto.
+if [ $# -gt 0 ]; then
+    exec "$@"
+else
+    echo ">>> Lanzando servidor Flask..."
+    exec flask run --host=0.0.0.0 --port=5000
+fi
+
