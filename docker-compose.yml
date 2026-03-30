@@ -7,6 +7,8 @@ services:
     restart: always
     ports:
       - "5001:5000"
+      - "5002:5002"    
+   
     environment:
       OPENECOE_SECRET: ${API_SECRET} # Usa variables de entorno externas
       OPENECOE_DB_HOST: db
@@ -21,8 +23,10 @@ services:
       ALEMBIC_UPGRADE: DO
       DEBUG: "False"        
       LOG_TO_STDOUT: "True"
+      
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/status/"]
+      #test: ["CMD", "curl", "-f", "http://localhost:5000/status/"]
+      test: ["CMD", "curl", "-f", "http://localhost:5000/backend/status/"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -33,19 +37,24 @@ services:
         condition: service_healthy
     command: >
       bash -c "flask rq worker & 
+      gunicorn openecoe-chrono:app -k eventlet --workers 1 --bind 0.0.0.0:5002 --timeout 120 &
       gunicorn openecoe-api:app --bind 0.0.0.0:5000 --workers 4 --timeout 120"
+    
     
   # --- BASE DE DATOS ---
   db:
     extends:
       file: ./backend/.docker/docker-compose.persistence.yml
       service: db
+    restart: always
 
   # --- REDIS ---
   redis:
     extends:
       file: ./backend/.docker/docker-compose.persistence.yml
       service: redis
+    restart: always
+    
   # --- FRONTEND (WEBUI) ---
   webui:
     build:
@@ -56,8 +65,11 @@ services:
       - "4200:80"
     environment:
       # En producción, el front se comunica con la IP pública del API o vía Ingress
+      #BACKEND_URL: "http://localhost:5001" 
       BACKEND_URL: "http://localhost:5001" 
+      
     depends_on:
       - api
+    
 volumes:
   mysql_data:
