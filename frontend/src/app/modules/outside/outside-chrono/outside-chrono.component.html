@@ -1,0 +1,32 @@
+<nz-content padding class="container">
+  <nz-page-header class="margin-top margin-bottom"
+                  (nzBack)="onBack()" nzBackIcon
+                  [nzTitle]="Title">
+  </nz-page-header>
+
+  <ng-template #Title>
+    <h1>{{ 'EVALUATION' | translate }}</h1>
+    <h2 *ngIf="ecoeName && roundDescription">
+      {{ ecoeName + ' - ' + roundDescription }}
+      <span *ngIf="loop" nz-icon nzType="retweet" nzTheme="outline" class="retweet-icon"></span>
+    </h2>
+  </ng-template>
+
+  <app-chrono
+    [idEcoe]="ecoeId"
+    [roundId]="roundId"
+    withPreview="true"
+    [templateBeforeStart]="ChronoPreview"
+    (loop)="getLoop($event)"
+  >
+  </app-chrono>
+
+  <ng-template #ChronoPreview>
+    <nz-alert
+      nzType="info"
+      [nzMessage]="('STATUS' | translate) + ':'"
+      [nzDescription]="('PENDING_TO_START' | translate)"
+      nzShowIcon
+    ></nz-alert>
+  </ng-template>
+</nz-content>

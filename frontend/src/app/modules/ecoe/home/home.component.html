@@ -1,0 +1,240 @@
+<nz-content padding>
+  <div nz-row nzJustify="space-around" nzAlign="middle">
+    <nz-page-header
+      class="margin-top margin-bottom"
+      [nzTitle]="'ECOES' | translate"
+      [nzSubtitle]="'LIST' | translate"
+      nz-col
+      nzFlex="1"
+    >
+    </nz-page-header>
+
+    <button
+      nz-button
+      nzType="primary"
+      nzDanger
+      (click)="showDelisted()"
+      *ngIf="Listed"
+    >
+      <span nz-icon nzType="container" nzTheme="outline"></span>
+      {{ "SHOW_ARCHIVED_ECOES" | translate }}
+    </button>
+    <button
+      nz-button
+      nzType="primary"
+      nzDanger
+      (click)="showListed()"
+      *ngIf="Delisted"
+    > 
+      <span nz-icon nzType="container" nzTheme="outline"></span>
+      {{ "SHOW_ECOES" | translate }}
+    </button>
+  </div>
+  <div *ngIf="Listed">
+    <nz-list nzGrid>
+      <div nz-row [nzGutter]="16">
+        <div
+          *ngIf="userService.userData?.isAdmin"
+          nz-col
+          [nzXXl]="6"
+          [nzXl]="8"
+          [nzSm]="12"
+          [nzXs]="24"
+        >
+          <nz-list-item>
+            <nz-card [nzTitle]="'CREATE_ECOE' | translate">
+              <a
+                nz-button
+                nzSize="large"
+                nzBlock
+                (click)="showCreateEcoe = true"
+                nzType="dashed"
+              >
+                <span nz-icon nzType="plus" nzTheme="outline"></span>
+                {{ "" | translate }}
+              </a>
+            </nz-card>
+          </nz-list-item>
+        </div>
+        <div
+          nz-col
+          [nzXXl]="6"
+          [nzXl]="8"
+          [nzSm]="12"
+          [nzXs]="24"
+          *ngFor="let item of ecoesList"
+        >
+          <nz-list-item>
+            <nz-card [nzTitle]="cardTitleTemplate">
+              <ng-template #cardTitleTemplate>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span>{{ item.name }}</span>
+                  <div>
+                    <a (click)="showEditEcoeDrawer(item)" nz-tooltip [nzTooltipTitle]=" 'EDIT' | translate"  style="margin-right: 15px;">
+                      <span nz-icon nzType="edit" nzTheme="outline"></span>
+                    </a>
+                    <a (click)="exportECOE(item)" nz-tooltip [nzTooltipTitle]=" 'EXPORT' | translate"  style="margin-right: 15px;">
+                      <span nz-icon nzType="download" nzTheme="outline"></span>
+                    </a>
+                    <a (click)="cloneECOE(item)" nz-tooltip [nzTooltipTitle]=" 'DUPLICATE' | translate">
+                      <span nz-icon nzType="copy" nzTheme="outline"></span>
+                    </a>
+                  </div>
+                </div>
+              </ng-template>
+
+              <a
+                nz-button
+                [routerLink]="[
+                  '/ecoe/' +
+                    item['id'] +
+                    (userService?.userData?.isEval ? '/eval' : '/admin')
+                ]"
+                nzSize="large"
+                nzBlock
+                preserveFragment="false"
+                nzType="primary"
+              >
+                <span nz-icon nzType="setting" nzTheme="outline"></span>
+                {{ "" | translate }}
+              </a>
+            </nz-card>
+          </nz-list-item>
+        </div>
+      </div>
+    </nz-list>
+  </div>
+  <!--Lo que se muestra cuando se hace click en el boton de mostrar Archivadas-->
+  <div *ngIf="Delisted">
+    <nz-list nzGrid>
+      <div nz-row [nzGutter]="16">
+        <div
+          nz-col
+          [nzXXl]="6"
+          [nzXl]="8"
+          [nzSm]="12"
+          [nzXs]="24"
+          *ngFor="let item of ecoesDelist"
+        >
+          <nz-list-item>
+            <nz-card [nzTitle]="item.name">
+              <a
+                nz-button
+                nzSize="large"
+                nzBlock
+                nzType="primary"
+                (click)="restoreEcoe(item['id'])"
+              >
+              <span nz-icon nzType="setting" nzTheme="outline"></span>
+              {{ "RESTORE_ECOE" | translate }}
+              </a>
+            </nz-card>
+          </nz-list-item>
+        </div>
+      </div>
+    </nz-list>
+  </div>
+</nz-content>
+
+<nz-drawer
+  [nzWidth]="400"
+  [nzMaskClosable]="true"
+  [nzVisible]="showCreateEcoe"
+  [nzTitle]="'CREATE_ECOE' | translate"
+  (nzOnClose)="closeDrawer()"
+>
+  <form nz-form [formGroup]="validateForm" (ngSubmit)="submitFormECOE(validateForm)" style="width: 95%;">
+    <nz-form-item>
+      <nz-form-control nzHasFeedback [nzValidatingTip]="'VALIDATING' | translate" [nzErrorTip]="userErrorTpl">
+        <input nz-input formControlName="ecoeName" [placeholder]="'ECOE_NAME' | translate" />
+        <ng-template #userErrorTpl let-control>
+          <ng-container *ngIf="control.hasError('required')">
+            {{ "ECOE_NAME_REQUIRED" | translate }}
+          </ng-container>
+          <ng-container *ngIf="control.hasError('duplicated')">
+            {{'ERROR_DUPLICATE_ECOE' | translate }}
+          </ng-container>
+        </ng-template>
+      </nz-form-control>
+    </nz-form-item>
+
+    <button type="submit" nz-button nzType="primary" [disabled]="!validateForm.valid" style="width: 100%; justify-content: center;">
+      <span>{{ "CREATE" | translate }}</span>
+    </button>
+  </form>
+
+  <div style="width: 95%; margin-top: 20px;height: 200px;">
+    <nz-divider nzText="o"></nz-divider>
+    <h3>{{ "IMPORT_ECOE" | translate }}</h3>
+    <nz-upload
+      [nzMultiple]="false"
+      [nzAccept]="'.json,.ecoe'"
+      [nzCustomRequest]="handleUpload"
+      [nzShowUploadList]="false"
+      nzType="drag"
+      >
+      <p class="ant-upload-drag-icon">
+        <span nz-icon nzType="inbox"></span>
+      </p>
+      <p class="ant-upload-text">{{ 'CLICK_HERE_OR_DRAG_FILE' | translate }}</p>
+      <p class="ant-upload-hint">
+        {{ 'DO_NOT_SELECT_OR_DRAG_MORE_THAN_ONE_FILE' | translate }}
+      </p>
+    </nz-upload>
+
+  </div>
+
+</nz-drawer>
+
+<nz-drawer
+  [nzWidth]="400"
+  [nzMaskClosable]="true"
+  [nzVisible]="showEditEcoe"
+  [nzTitle]="'EDIT_ECOE' | translate"
+  (nzOnClose)="closeDrawer()"
+>
+  <form nz-form [formGroup]="validateForm" (ngSubmit)="submitFormEditECOE(validateForm)" style="width: 95%;">
+    <nz-form-item>
+      <nz-form-control nzHasFeedback [nzValidatingTip]="'VALIDATING' | translate" [nzErrorTip]="userErrorTpl">
+        <input nz-input formControlName="ecoeName" [placeholder]="'ECOE_NAME' | translate" [value]="ecoe?.name"/>
+        <ng-template #userErrorTpl let-control>
+          <ng-container *ngIf="control.hasError('required')">
+            {{ "ECOE_NAME_REQUIRED" | translate }}
+          </ng-container>
+          <ng-container *ngIf="control.hasError('duplicated')">
+            {{'ERROR_DUPLICATE_ECOE' | translate }}
+          </ng-container>
+        </ng-template>
+      </nz-form-control>
+    </nz-form-item>
+
+    <button type="submit" nz-button nzType="primary" [disabled]="!validateForm.valid" style="width: 100%; justify-content: center;">
+      <span>{{ "ACCEPT" | translate }}</span>
+    </button>
+  </form>
+</nz-drawer>
+
+<nz-modal 
+[(nzVisible)]="isVisible" 
+nzTitle="{{ 'ECOE_TO_IMPORT_NAME' | translate }}"
+(nzOnCancel)="handleCancel()"
+(nzOnOk)="handleOk()"
+[nzOkDisabled]="!ecoeNameJSON">
+  <ng-container *nzModalContent>
+    <form nz-form [formGroup]="validateFormJSON" (ngSubmit)="submitFormECOE(validateFormJSON)">
+      <nz-form-item>
+        <nz-form-control nzHasFeedback [nzValidatingTip]="'VALIDATING' | translate" [nzErrorTip]="userErrorTpl">
+          <input nz-input formControlName="ecoeNameJSON" [placeholder]="'ECOE_NAME' | translate" [(ngModel)]="ecoeNameJSON"  />
+          <ng-template #userErrorTpl let-control>
+            <ng-container *ngIf="control.hasError('required')">
+              {{ "ECOE_NAME_REQUIRED" | translate }}
+            </ng-container>
+            <ng-container *ngIf="control.hasError('duplicated')">
+              {{'ERROR_DUPLICATE_ECOE' | translate }}
+            </ng-container>
+          </ng-template>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </ng-container>
+</nz-modal>

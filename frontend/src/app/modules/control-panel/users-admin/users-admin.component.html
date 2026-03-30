@@ -1,0 +1,234 @@
+<nz-drawer
+  [nzClosable]="true"
+  [nzVisible]="importErrors.length > 0"
+  nzPlacement="right"
+  [nzTitle]="'IMPORT_ERRORS'"
+  (nzOnClose)="cleanImportErrors()"
+  [nzWidth]="540"
+>
+  <nz-alert *ngFor="let error of importErrors, let idx=index"
+            nzType="error"
+            nzCloseable
+            [nzMessage]="error.reason.statusText"
+            [nzDescription]="error.reason.message"
+            nzShowIcon
+  >
+  </nz-alert>
+</nz-drawer>
+
+<nz-content>
+<nz-table #table
+          [nzPageIndex]="page"
+          [nzPageSize]="perPage"
+          (nzPageIndexChange)="pageChange($event)"
+          (nzPageSizeChange)="pageSizeChange($event)"
+          [nzLoading]="loading"
+          [nzTotal]="totalItems"
+          [nzData]="users"
+          [nzFrontPagination]="false"
+          nzShowSizeChanger
+          nzShowPagination>
+  <thead>
+  <tr>
+    <th>
+      <a (click)="loadUsers()">
+        <i nz-icon nzType="reload" [nz-tooltip] [nzTooltipPlacement]="'bottom'" [nzTooltipTitle]="'REFRESH' | translate"></i>
+      </a>
+    </th>
+    <th>{{"EMAIL" | translate}}</th>
+    <th>{{"NAME" | translate}}</th>
+    <th>{{"SURNAMES" | translate}}</th>
+    <th nzWidth="450px">{{"ROLES" | translate}}</th>
+    <th nzWidth="250px">
+      <nz-button-group>
+        <button nz-button [nzType]="'primary'" class="margin-left"
+                [nz-tooltip] [nzTooltipTitle]="'ADD_USER' | translate"
+                (click)="showModal()">
+          <i nz-icon nzType="plus-circle" nzTheme="twotone" icon-16></i>
+        </button>
+        <app-upload-and-parse [parserFile]="usersParser" (parserResult)="importUsers($event)"></app-upload-and-parse>
+        <button nz-button nzType="danger" class="margin-left"
+                [nz-tooltip] [nzTooltipTitle]="'DELETE_SELECTED' | translate"
+                (click)="delSelected()">
+          <i nz-icon nzType="delete" icon-16></i>
+        </button>
+      </nz-button-group>
+    </th>
+  </tr>
+  </thead>
+  <tbody>
+
+  <ng-template ngFor let-item  let-idx="index" [ngForOf]="table.data">
+    <tr>
+      <td  
+      [(nzChecked)]="item.checked">
+      </td>
+
+      <td>
+        <ng-container>
+          {{item.email}}
+        </ng-container>
+
+      </td>
+
+      <td>
+        <ng-container>
+          {{item.name}}
+        </ng-container>
+
+      </td>
+
+      <td>
+        <ng-container>
+          {{item.surname}}
+        </ng-container>
+
+      </td>
+      
+      <td>
+        <ng-container *ngIf="!editCache[idx]?.editItem; else editRoles">
+          <ng-container *ngFor="let rol of item.rolesList">
+            <nz-tag [nzColor]="shared.stringToColour(rol.name)">
+              {{rol.name | translate}}
+            </nz-tag>
+          </ng-container>
+        </ng-container>
+
+        <ng-template #editRoles>
+          <nz-select
+            style="width: 100%"
+            nzSize="small"
+            [nzMaxTagCount]="5"
+            [nzMaxTagPlaceholder]="tagPlaceHolder"
+            nzMode="multiple"
+            [nzPlaceHolder]="'SELECT_ROLES' | translate"
+            (ngModelChange)="onRolesChanged(idx, $event)"
+            [(ngModel)]="editCache[idx].data.roleNames"
+          >
+            <nz-option *ngFor="let role of listRoles"
+                       [nzLabel]="role.name | translate"
+                       [nzValue]="role.name"
+                       [nzDisabled]="isDissabled(idx, role.name)"
+            >
+
+            </nz-option>
+          </nz-select>
+          <ng-template #tagPlaceHolder let-selectedList> and {{ selectedList.length }} more selected </ng-template>
+        </ng-template>
+      </td>
+      <!---
+        XXX
+      -->
+      <td text-right>
+        <app-action-buttons [showDeleteButton]="!(activeUser.id === item.id)"
+                            (startEdit)="showModalEdit(item)"
+                            (delete)="delUser(item)">
+        </app-action-buttons>
+      </td>
+    </tr>
+  </ng-template>
+  </tbody>
+</nz-table>
+</nz-content>
+<!--
+  MODAL DE ADD_USER
+-->
+<nz-modal *ngIf="validateForm"
+  [nzVisible]="showAddUser || showEditUser"
+  [nzTitle]="showAddUser?('ADD_USER' | translate) : ('EDIT_USER' | translate: {email: usuarioOriginal?.email})"
+  [nzOkText]="'ACCEPT' | translate"
+  [nzCancelText]="'CANCEL' | translate"
+  [nzMaskClosable]="false"
+  (nzOnOk)="submitFormUser(validateForm)"
+  (nzOnCancel)="closeModal()">
+
+  <form nz-form [formGroup]="validateForm">
+    <nz-form-item *ngIf="showAddUser">
+      <nz-form-control [nzSpan]="24" nzHasFeedback [nzErrorTip]="emailErrorTpl">
+        <nz-input-group [nzPrefixIcon]="'mail'">
+          <input type="email" nz-input
+                 formControlName="email"
+                 [placeholder]="'EMAIL' | translate">
+        </nz-input-group>
+        <ng-template #emailErrorTpl let-control>
+          <ng-container *ngIf="control.hasError('email')">{{'EMAIL_NOT_VALID' | translate}}</ng-container>
+          <ng-container *ngIf="control.hasError('duplicated')">{{'EMAIL_EXISTS' | translate}}</ng-container>
+        </ng-template>
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+      <nz-form-control [nzSpan]="24" nzHasFeedback [nzErrorTip]="errorPasswordTpl">
+        <nz-input-group [nzPrefixIcon]="'lock'" >
+          <input [type]="passwordVisible ? 'text' : 'password'" nz-input
+                 formControlName="password"
+                 [placeholder]="'PASSWORD' | translate">
+        </nz-input-group>
+        <ng-template #errorPasswordTpl let-control>
+          <ng-container *ngIf="control.hasError('required')">{{'PASSWORD_REQUIRED' | translate}}</ng-container>
+          <ng-container *ngIf="control.hasError('minlength')">
+            {{'PASSWORD_MIN_LENGTH' | translate : {min: control.getError('minlength').requiredLength} }}
+          </ng-container>
+        </ng-template>
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+      <nz-form-control [nzSpan]="24" nzHasFeedback [nzErrorTip]="errorPasswordCheckTpl">
+        <nz-input-group [nzPrefixIcon]="'lock'" >
+          <input [type]="passwordVisible ? 'text' : 'password'" nz-input
+                 formControlName="checkPassword"
+                 [placeholder]="'CONFIRM_PASSWORD' | translate">
+        </nz-input-group>
+        <ng-template #errorPasswordCheckTpl let-control>
+          <ng-container *ngIf="control.hasError('required')">{{'PLEASE_CONFIRM_PASSWORD' | translate}}</ng-container>
+          <ng-container *ngIf="control.hasError('confirm')">
+            {{'PASSWORD_CONFIRM_ERROR' | translate}}
+          </ng-container>
+        </ng-template>
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+      <nz-form-control [nzSpan]="24" [nzErrorTip]="'NAME_REQUIRED' | translate">
+        <nz-input-group nzCompact>
+          <input type="text" nz-input
+                 formControlName="userName"
+                 placeholder="{{'NAME' | translate}}">
+        </nz-input-group>
+      </nz-form-control>
+      <nz-form-control [nzSpan]="24" [nzErrorTip]="'SURNAME_REQUIRED' | translate">
+        <nz-input-group nzCompact>
+          <input type="text" nz-input
+                 formControlName="userSurname"
+                 placeholder="{{'SURNAMES' | translate}}">
+        </nz-input-group>
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+      <nz-form-control>
+        <nz-input-group>
+        <nz-form-label >Roles</nz-form-label>
+          <nz-select
+          style="width: 100%"
+          nzSize="small"
+          [nzMaxTagCount]="5"
+          nzMode="multiple"
+          [nzPlaceHolder]="'SELECT_ROLES' | translate"
+          [nzAllowClear]="true"
+          nzAllowClear
+          formControlName="roles"
+          >
+            <nz-option *ngFor="let role of listRoles"
+                      [nzLabel]="role.name | translate"
+                      [nzValue]="role.name"
+            >
+          </nz-option>
+        </nz-select>
+
+        </nz-input-group>
+      </nz-form-control>
+    </nz-form-item>
+  </form>
+</nz-modal>

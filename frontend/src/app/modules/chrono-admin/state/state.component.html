@@ -1,0 +1,113 @@
+<nz-page-header class="margin-top"  (nzBack)="onBack()" nzBackIcon [nzTitle]="ecoe?.name">
+  <nz-page-header-extra>
+
+    <a *ngIf="(ecoe?.status | uppercase)=='PUBLISHED'" nz-button class="warning" (click)="draftECOE()" [nzLoading]="changing_state">
+      <span nz-icon nzType="eye-invisible" nzTheme="outline"></span>
+      {{ 'ACTION_STATE_DRAFT' | translate }}
+    </a>
+
+  </nz-page-header-extra>
+</nz-page-header>
+
+
+<nz-content padding *ngIf="(ecoe?.status | uppercase)=='DRAFT'">
+  <nz-empty
+    [nzNotFoundContent]="contentTpl"
+    [nzNotFoundFooter]="footerTpl">
+
+    <ng-template #contentTpl>
+      <span>{{ 'NO_ECOE_PUBLISHED' | translate }}</span>
+    </ng-template>
+    <ng-template #footerTpl>
+      <a nz-button class="success" (click)="publishECOE()" [nzLoading]="changing_state">
+        <span nz-icon nzType="eye" nzTheme="outline"></span>
+        {{ 'ACTION_STATE_PUBLISH' | translate }}
+      </a>
+    </ng-template>
+  </nz-empty>
+</nz-content>
+
+<nz-content padding *ngIf="(ecoe?.status | uppercase)=='PUBLISHED'" >
+  <button (click)="setLoop()" nz-button [nzType]="loop ? 'primary' : 'default'" class="loopButton"><span nz-icon class="retweet-icon" nzType="retweet" nzTheme="outline"></span>
+    <span *ngIf="loop">
+      {{ 'DESACTIVATE_LOOP' | translate }}
+    </span>
+    <span *ngIf="!loop">
+      {{ 'ACTIVATE_LOOP' | translate }}
+    </span>
+  </button>
+
+  <div nz-row nzJustify="space-between" nzGutter="8" nzAlign="top" class="border">
+    <div nz-col margin-top nzSm="24" nzMd="14">
+      <div padding background-white>
+        <button (click)="startECOE()" [disabled]="ecoeStarted" nzSize="large" nz-button nzBlock margin-top nzType="primary">
+          <i nz-icon nzType="play-circle"></i>
+          {{ 'START' | translate }}
+        </button>
+        <nz-button-group nz-row margin-top *ngIf="ecoeStarted">
+          <div nz-col nzXs="24" nzSm="12">
+            <button (click)="paused ? playECOE(ecoeId) : pauseECOE(ecoeId)" nzBlock nz-button [nzType]="paused ? 'primary' : 'default'" [nzDanger]="paused ? 'false' : 'true'" [style]="paused ? ' ' : ' background: #faad14; border-color: #faad14; color: black;'">
+              <i nz-icon [nzType]="paused ? 'play-circle' : 'pause'" nzTheme="outline"></i>
+              {{ paused ? ('CONTINUE_ALL' | translate) : ('PAUSE_ALL' | translate) }}
+            </button>
+          </div>
+          <div nz-col nzXs="24" nzSm="12">
+            <a nz-button nzBlock nzType="danger" nz-popconfirm 
+               [nzPopconfirmTitle]="'STOP_CONFIRMATION' | translate"
+               (nzOnConfirm)="stopECOE(ecoeId)" [nzPopconfirmPlacement]="'top'"
+               [nzOkType]="'danger'" [nzOkText]="'STOP' | translate" [nzCancelText]="'CANCEL' | translate"
+               [nzIcon]="iconDeleteTpl">
+              <i nz-icon nzType="stop"></i>
+              {{ 'STOP' | translate }}
+            </a>
+            <ng-template #iconDeleteTpl>
+              <i nz-icon nzType="question-circle" class="error" nzTheme="outline"></i>
+            </ng-template>
+          </div>
+        </nz-button-group>        
+      </div>
+    </div>
+
+    <div nz-col margin-top nzSm="24" nzMd="10">
+      <div class="outside-chrono" padding text-left >
+        <app-chrono *ngIf="ecoe"
+          [idEcoe]="ecoe.id"
+          [round]="rounds[0]"
+          [mute]="true"
+          (loop)="getLoop($event)">
+        </app-chrono>
+        <nz-alert *ngIf="errorAlert"
+                  nzType="warning"
+                  [nzMessage]="'WARNING' | translate"
+                  [nzDescription]="errorAlert"
+                  nzShowIcon
+                  nzCloseable
+                  margin-top
+                  (nzOnClose)="clearAlertError()">
+        </nz-alert>
+      </div>
+    </div>
+  </div>
+
+  <div nz-row nzType="flex" nzJustify="start" margin-top>
+    <ng-container *ngFor="let round of rounds">
+      <div nz-col nzXs="24" nzSm="12" nzMd="8" nzXl="6" padding class="c-card border">
+        <app-chrono
+          [round]="round"
+          [idEcoe]="ecoeId"
+          [showDetails]="false"
+          [mute]="true"
+          (state)="getState($event)">
+          <nz-button-group nzSize="default" *ngIf="ecoeStarted" style="width: 100%;">
+            <ng-container *ngIf="pauses[round.id]; else pausedState">
+              <button (click)="playRound(round.id)" nz-button nzType="primary" style="width: 100%;"><i nz-icon nzType="play-circle" nzTheme="outline"></i>{{'CONTINUE' | translate}}</button>
+            </ng-container>
+            <ng-template #pausedState>
+              <button (click)="pauseRound(round.id)" nz-button nzType="primary" style=' background: #faad14; border-color: #faad14; color: black;width: 100%;'><i nz-icon nzType="pause-circle" nzTheme="outline"></i>{{'PAUSE' | translate}}</button>
+            </ng-template>
+          </nz-button-group>
+        </app-chrono>
+      </div>
+    </ng-container>    
+  </div>  
+</nz-content>

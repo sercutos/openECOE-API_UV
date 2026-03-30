@@ -1,0 +1,36 @@
+<nz-content>
+  <nz-page-header
+    class="margin-bottom"
+    (nzBack)="onBack()"
+    nzBackIcon
+    [nzTitle]="'GENERATE_RESULTS' | translate"
+  >
+    <nz-breadcrumb nz-page-header-breadcrumb>
+      <nz-breadcrumb-item
+        ><a
+          class="secondary-link"
+          [routerLink]="['/ecoe/' + ecoeId + '/results']"
+          >{{ ecoe_name }}</a
+        ></nz-breadcrumb-item
+      >
+      <nz-breadcrumb-item
+        ><nz-tag class="secondary-tag">{{
+          "GENERATE_RESULTS" | translate
+        }}</nz-tag></nz-breadcrumb-item
+      >
+    </nz-breadcrumb>
+  </nz-page-header>
+</nz-content>
+<nz-button-group style="display: flex; justify-content: end; width: 100%; margin-bottom: 20px;">
+  <button (click)="saveTemplate()" nz-button nzSize="large"><span nz-icon nzType="save"></span>
+    {{ "SAVE_TEMPLATE" | translate }}
+  </button>
+
+  <button (click)="generateResult()" nz-button nzType="primary" nzSize="large" style="margin-left: 20px;"><span nz-icon nzType="plus-circle"></span>
+    {{ "GENERATE" | translate }}
+  </button>
+</nz-button-group>
+
+<div class="jodit-center">
+  <jodit-editor [config]="config" [(ngModel)]="editorContent" style="justify-content: center;"></jodit-editor>
+</div>

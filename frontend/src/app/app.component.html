@@ -1,0 +1,39 @@
+<nz-layout class="layout">
+  <nz-header>
+    <div style="display: flex; gap: 10px">
+      <a (click)="isCollapsed = !isCollapsed" style="font-size: 30px;">
+        <i nz-icon [nzType]="isCollapsed ? 'menu-fold' : 'menu-unfold'"></i>
+      </a>
+      <a routerLink="/ecoe" title="{{'BACK_ECOE' | translate }}" style="display: flex; align-items: center;">
+        <img alt="logo" src="../assets/logo.png" class="logo">
+      </a>
+      <app-change-organization *ngIf="isLoggedIn()"></app-change-organization>
+    </div>
+
+    
+    <div style="display: flex;" *ngIf="isLoggedIn()">
+      <app-submenu [submenuSelected]="'ECOE'"></app-submenu>
+      <app-usermenu></app-usermenu>
+    </div>
+  </nz-header>
+
+  <nz-content>
+    <div class="long-div" #TopDiv>
+      <div class="inner-nz-content long-div-inner">
+        <router-outlet></router-outlet>
+      </div>
+      <nz-footer>
+        <p>openECOE {{year}} - Universidad de Valencia- Facultad de Medicina y Odontología</p>
+      </nz-footer>
+      <nz-back-top [nzTarget]="TopDiv" #backTop></nz-back-top>
+    </div>
+  </nz-content>
+</nz-layout>
+
+<nz-drawer  [nzVisible]="isCollapsed"
+            [nzPlacement]="'left'"
+            [nzWidth]="320"
+            (nzOnClose)="isCollapsed = !isCollapsed"
+            [nzBodyStyle]="{'padding':'0'}">
+  <app-menu (menu_close_event)="toCollapse($event)"></app-menu>
+</nz-drawer>

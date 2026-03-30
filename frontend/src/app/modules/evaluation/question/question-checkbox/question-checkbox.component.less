@@ -1,0 +1,65 @@
+nz-switch {
+  justify-content: center;
+  padding-bottom: 5px;
+}
+
+::ng-deep .ant-switch {
+  width: 100%;
+  max-width: 150px !important;
+  padding: 3px !important;
+  position: relative;
+}
+
+::ng-deep .ant-switch-handle {
+  height: 90%;
+  width: 12px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+::ng-deep .ant-switch-handle::before {
+  border-radius: 3px;
+}
+
+::ng-deep .ant-switch-checked .ant-switch-handle {
+  left: calc(90%);
+}
+
+.positive-points {
+  ::ng-deep .ant-switch-checked {
+    background-color: #5cb85c !important;
+  }
+}
+
+.negative-points {
+  ::ng-deep .ant-switch-checked {
+    background-color: #CF1322 !important;
+  }
+}
+
+
+::ng-deep .br-horizontal .br-unit.br-selected {
+  background-color: #5cb85c !important;
+}
+
+::ng-deep .br-unit.br-active {
+  background-color: #5cb85c !important;
+}
+
+::ng-deep .br-unit {
+  background-color: #c0f8c7 !important;
+}
+
+::ng-deep .br-text {
+  color: #5cb85c !important;
+}
+
+
+.rate-in {
+  background-color: #5cb85c;
+}
+
+.rate-out {
+  background-color: #fafafa;
+}
