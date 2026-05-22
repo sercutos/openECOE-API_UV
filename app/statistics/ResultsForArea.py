@@ -43,10 +43,10 @@ def get_results_for_area(area,ecoe) -> pd.DataFrame:
         #perc:: Percentil de la columna punt
         df_answer_area['perc'] = df_answer_area['points'].rank(pct=True).map(lambda x: ceil(x*10)*10)
         # Peso relativo del área
-        weith = get_area_weith(area)
-        df_answer_area = df_answer_area.assign(weith=float(weith))
+        weight = get_area_weight(area)
+        df_answer_area = df_answer_area.assign(weight=float(weight))
         # Filtramos columnas finales en el orden deseado e incluimos puntos y total_points
-        df_answer_area = df_answer_area.loc[:,['id_student','punt','pos','med','perc', 'weith','points','total_points']]
+        df_answer_area = df_answer_area.loc[:,['id_student','punt','pos','med','perc', 'weight','points','total_points']]
         return df_answer_area
 
     except Exception as err:
@@ -80,9 +80,9 @@ def results_by_area(idecoe) -> pd.DataFrame:
             #Este if esta porque si una Area no tiene preguntas hace que crashee el proceso, por lo que si el area no tiene preguntas, lo ignoramos
             if( isinstance(aux, pd.DataFrame) ):
                 nombre_area = id_area[1]
-                w = float(get_area_weith(str(id_area[0])))
+                w = float(get_area_weight(str(id_area[0])))
                 # Añadimos la columna con el peso relativo
-                aux['weith_{}'.format(nombre_area)] = w
+                aux['weight_{}'.format(nombre_area)] = w
                 
                 lista_df.append( aux.rename(columns = {
                     'punt':'punt_{}'.format(id_area[1]),
@@ -108,8 +108,8 @@ def results_by_area(idecoe) -> pd.DataFrame:
 
         for id_area in areas:
             nombre = id_area[1]  # nombre del área
-            #w = get_area_weith(str(id_area[0]))
-            w = float(get_area_weith(str(id_area[0])))  # fuerza tipo float
+            #w = get_area_weight(str(id_area[0]))
+            w = float(get_area_weight(str(id_area[0])))  # fuerza tipo float
             columna_punt = f"punt_{nombre}"
             if columna_punt in df_total.columns:
                 df_total['nota_global'] += df_total[columna_punt] * (w / 100)
@@ -121,10 +121,10 @@ def results_by_area(idecoe) -> pd.DataFrame:
             error = error + arg
         return "ko - Error: " + error
 #SCT obtenemos el peso por area 
-def get_area_weith(id_area):
+def get_area_weight(id_area):
     conexion = db.engine
-    df = pd.read_sql("SELECT weith FROM area WHERE id=" + id_area, conexion)
-    if df.empty or pd.isna(df.iloc[0]['weith']):
+    df = pd.read_sql("SELECT weight FROM area WHERE id=" + id_area, conexion)
+    if df.empty or pd.isna(df.iloc[0]['weight']):
         return 100  # valor por defecto
-    return df.iloc[0]['weith']
+    return df.iloc[0]['weight']
 

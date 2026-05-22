@@ -24,7 +24,7 @@ class Area(db.Model):
     name = db.Column(db.String(255))
     id_ecoe = db.Column(db.Integer, db.ForeignKey('ecoe.id'), nullable=False)
     code = db.Column(db.String(20), nullable=False)
-    weith = db.Column(db.Integer, nullable=False, default=0)  # SCT
+    weight = db.Column(db.Integer, nullable=False, default=0)  # SCT
 
     questions = db.relationship('Question', backref='area')
 
@@ -37,7 +37,7 @@ class Area(db.Model):
         area_json = {
             "name": self.name,
             "code": self.code,
-            "weith": self.weith,
+            "weight": self.weight,
         }
 
         return area_json

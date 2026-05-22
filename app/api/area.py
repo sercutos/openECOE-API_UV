@@ -35,4 +35,4 @@ class AreaResource(EcoeChildResource):
         # SCT
         """ name = fields.String(required=True)
         code = fields.String(required=True)
-        weith = fields.Integer(required=True, default=0, min=0, max=100)   """
+        weight = fields.Integer(required=True, default=0, min=0, max=100)   """

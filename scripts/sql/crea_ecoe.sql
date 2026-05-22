@@ -4,7 +4,7 @@
 -- Borramos ECOE
 -- DELETE FROM ecoe WHERE name = 'ECOE2023'   AND id_organization = 2   AND id_coordinator = 2   AND status = 'DRAFT'   AND chrono_token IS NULL   AND description = 'Descripción del ECOE'  AND id_job_reports IS NULL   AND id_job_csv IS NULL;
 -- Creamos AREAS id = 95
--- INSERT INTO area (name, id_ecoe, code, weith) VALUES ('ANAMNESIS', 37, 'ANAMNESIS', 100);
+-- INSERT INTO area (name, id_ecoe, code, weight) VALUES ('ANAMNESIS', 37, 'ANAMNESIS', 100);
 -- Creamos Estaciones id 86
 -- INSERT INTO station (name, id_ecoe, `order`, id_parent_station, id_manager) VALUES ('Estación_1', 37, 1, NULL, 1);
 -- Creamos bloques de preguntas para esa estación id= 207

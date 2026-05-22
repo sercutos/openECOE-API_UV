@@ -10,7 +10,7 @@ PASSWORD = "Kui0chee"
 NAME_ECOE = 'ECOE'
 NAME_AREA = 'A1'
 CODE_AREA = 'A1'
-WEITH_AREA = 100
+WEIGHT_AREA = 100
 NAME_STATION = 'Estacion1'
 
 # ---------------------------
@@ -47,7 +47,7 @@ payload_area = {
     "code": CODE_AREA,
     "ecoe": {"$ref": uri_ecoe},
     "name": NAME_AREA,
-    "weith": WEITH_AREA
+    "weight": WEIGHT_AREA
 }
 
 response2 = requests.post(

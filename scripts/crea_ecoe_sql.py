@@ -100,9 +100,9 @@ url_areas = "http://localhost:5000/backend/api/v1/areas"
 uri_ecoe = f"/backend/api/v1/ecoes/{ecoe_id}"
 # Lista de áreas a crear
 areas = [
-    {"code": "A1", "name": "Área 1", "weith": 10},
-    {"code": "A2", "name": "Área 2", "weith": 20},
-    {"code": "A3", "name": "Área 3", "weith": 15},
+    {"code": "A1", "name": "Área 1", "weight": 10},
+    {"code": "A2", "name": "Área 2", "weight": 20},
+    {"code": "A3", "name": "Área 3", "weight": 15},
     # ... agrega hasta 10 o más
 ]
 
@@ -112,7 +112,7 @@ for area in areas:
         "code": area["code"],
         "ecoe": {"$ref": uri_ecoe},
         "name": area["name"],
-        "weith": area["weith"]
+        "weight": area["weight"]
     }
 
     response = requests.post(
